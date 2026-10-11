@@ -29,6 +29,8 @@ def row_to_product(row):
     if not re.fullmatch(r"\d{8,14}",barcode) or not name:return None
     kcal=safe_number(row.get("energy-kcal_100g"),900)
     if kcal is None:return None
+    # Explicitly filter missing / impossible high values, without inventing values.
+    if kcal == 0 and any(safe_number(row.get(k),100) not in (None,0) for k in ("proteins_100g","fat_100g","carbohydrates_100g")):return None
     nutrition={key:safe_number(row.get(column),100) for key,column in
                (("protein","proteins_100g"),("fat","fat_100g"),("carbs","carbohydrates_100g"))}
     brand=(row.get("brands") or "").split(",")[0].strip()[:90]
