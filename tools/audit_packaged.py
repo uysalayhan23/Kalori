@@ -41,8 +41,9 @@ def audit(path,max_bytes=5_000_000,min_products=0):
 
 def main():
     p=argparse.ArgumentParser();p.add_argument("--input",default="packaged-foods.js")
-    p.add_argument("--max-bytes",type=int,default=5_000_000);args=p.parse_args()
+    p.add_argument("--max-bytes",type=int,default=5_000_000)
     p.add_argument("--min-products",type=int,default=0,help="For release gating; default 0 to permit empty development catalogs")
+    args=p.parse_args()
     if args.min_products<0:p.error("min-products must be nonnegative")
     counts,errors=audit(args.input,args.max_bytes,args.min_products)
     print(json.dumps({"counts":counts,"errors":errors[:40],"error_count":len(errors)},ensure_ascii=False,indent=2))
