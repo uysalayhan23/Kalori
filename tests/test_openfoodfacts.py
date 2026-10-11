@@ -19,6 +19,12 @@ class OFFTests(unittest.TestCase):
         self.assertEqual(obj["store"],"")
         self.assertEqual(obj["reportedStores"],"Örnek mağaza")
         self.assertEqual(obj["barcode"],"8691234567890")
+    def test_brand_survives_import(self):
+        obj=row_to_product(self.valid())
+        self.assertEqual(obj["brand"],"Örnek Marka")
+    def test_country_tags_with_spaces(self):
+        row=self.valid();row["countries_tags"]="en:france, en:turkey"
+        self.assertIsNotNone(row_to_product(row))
     def test_not_marking_stores_verified(self):
         obj=row_to_product(self.valid())
         self.assertNotIn("Örnek mağaza",obj["name"])
