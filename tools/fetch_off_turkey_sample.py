@@ -3,7 +3,7 @@
 This is a manually run data-acquisition tool, NOT a scheduled task or APK build.
 Requires internet, uses one search request (OFF rate limits apply).
 """
-import argparse,json,re,sys,urllib.parse,urllib.request
+import argparse,json,sys,urllib.parse,urllib.request,os,tempfile
 from pathlib import Path
 from import_openfoodfacts import row_to_product
 
@@ -55,7 +55,33 @@ def main():
     output="/* Open Food Facts ODbL https://world.openfoodfacts.org/ - community data; not verified shop availability. */\n"
     output+="globalThis.KaloriPackagedFoods="+json.dumps(ordered,ensure_ascii=False,separators=(",",":"))+";\n"
     if len(output.encode("utf-8"))>args.max_bytes:p.exit(4,"Output exceeds size budget; existing file unchanged.\n")
-    Path(args.output).write_text(output,encoding="utf-8")
+    target=Path(args.output)
+    if target.exists():
+        existing=target.read_text(encoding="utf-8")
+        prefix="globalThis.KaloriPackagedFoods="
+        if prefix not in existing or not existing.strip().endswith(";"):
+            p.exit(5,"Existing catalog is unrecognized; refusing to overwrite.\\n")
+        try:
+            previous=json.loads(existing.split(prefix,1)[1].strip()[:-1])
+            if not isinstance(previous,list):raise ValueError("catalog must be an array")
+            for entry in previous:
+                if not isinstance(entry,dict) or not isinstance(entry.get("barcode"),str):
+                    raise ValueError("invalid existing product")
+                products.setdefault(entry["barcode"],entry)
+        except (ValueError,TypeError) as exc:
+            p.exit(5,f"Existing catalog invalid; refusing to overwrite: {exc}\\n")
+        ordered=sorted(products.values(),key=lambda x:(x["name"].casefold(),x["barcode"]))
+        output="/* Open Food Facts ODbL https://world.openfoodfacts.org/ - community data; not verified shop availability. */\\n"
+        output+="globalThis.KaloriPackagedFoods="+json.dumps(ordered,ensure_ascii=False,separators=(",",":"))+";\\n"
+        if len(output.encode("utf-8"))>args.max_bytes:
+            p.exit(4,"Merged output exceeds size budget; existing file unchanged.\\n")
+    target.parent.mkdir(parents=True,exist_ok=True)
+    handle=tempfile.NamedTemporaryFile(mode="w",encoding="utf-8",dir=target.parent,delete=False,suffix=".tmp")
+    try:
+        with handle as out:out.write(output)
+        os.replace(handle.name,target)
+    finally:
+        if os.path.exists(handle.name):os.unlink(handle.name)
     print(json.dumps({"products_exported":len(ordered),"search_page":args.page,
                       "page_size":args.page_size,"output":args.output},ensure_ascii=False))
 if __name__=="__main__":main()
