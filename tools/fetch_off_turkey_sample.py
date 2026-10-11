@@ -71,10 +71,10 @@ def main():
         except (ValueError,TypeError) as exc:
             p.exit(5,f"Existing catalog invalid; refusing to overwrite: {exc}\\n")
         ordered=sorted(products.values(),key=lambda x:(x["name"].casefold(),x["barcode"]))
-        output="/* Open Food Facts ODbL https://world.openfoodfacts.org/ - community data; not verified shop availability. */\\n"
-        output+="globalThis.KaloriPackagedFoods="+json.dumps(ordered,ensure_ascii=False,separators=(",",":"))+";\\n"
+        output="/* Open Food Facts ODbL https://world.openfoodfacts.org/ - community data; not verified shop availability. */\n"
+        output+="globalThis.KaloriPackagedFoods="+json.dumps(ordered,ensure_ascii=False,separators=(",",":"))+";\n"
         if len(output.encode("utf-8"))>args.max_bytes:
-            p.exit(4,"Merged output exceeds size budget; existing file unchanged.\\n")
+            p.exit(4,"Merged output exceeds size budget; existing file unchanged.\n")
     target.parent.mkdir(parents=True,exist_ok=True)
     handle=tempfile.NamedTemporaryFile(mode="w",encoding="utf-8",dir=target.parent,delete=False,suffix=".tmp")
     try:
