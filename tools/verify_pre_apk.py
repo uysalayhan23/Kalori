@@ -8,6 +8,19 @@ required=["index.html","foods.html","meal-builder.html","profile.html","barcode.
           "food-catalog.js","packaged-foods.js","manifest.webmanifest","service-worker.js",
           "tools/import_openfoodfacts.py","tools/import_usda.py","tools/audit_packaged.py"]
 failures=[]
+android_files=[
+ "android/settings.gradle.kts", "android/build.gradle.kts",
+ "android/app/build.gradle.kts", "android/app/src/main/AndroidManifest.xml",
+ "android/app/src/main/java/com/kalori/journal/MainActivity.java"
+]
+for name in android_files:
+    if not (ROOT/name).is_file():failures.append("Missing Android source "+name)
+try:
+    gradle=(ROOT/"android/app/build.gradle.kts").read_text(encoding="utf-8")
+    if "syncKaloriWebAssets" not in gradle or 'assets.srcDir(syncKaloriWebAssets)' not in gradle:
+        failures.append("Android HTML assets not wired to Gradle")
+except OSError:pass
+
 for path in required:
     if not (ROOT/path).is_file():failures.append("Missing "+path)
 try:
