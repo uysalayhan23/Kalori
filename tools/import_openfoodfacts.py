@@ -49,8 +49,11 @@ def run():
     p=argparse.ArgumentParser()
     p.add_argument("--input",required=True);p.add_argument("--output",required=True)
     p.add_argument("--limit",type=int,default=40000)
+    p.add_argument("--max-bytes",type=int,default=5_000_000,
+                   help="Maximum resulting JS bytes; stop with an error, never silently truncate")
     args=p.parse_args()
     if not 1<=args.limit<=300000:p.error("limit out of range")
+    if not 1024<=args.max_bytes<=100_000_000:p.error("max-bytes out of range")
     products={};count=0
     with open(args.input,encoding="utf-8",newline="") as fh:
         rows=csv.DictReader(fh,delimiter="\t")
@@ -64,6 +67,9 @@ def run():
     ordered=sorted(products.values(),key=lambda f:(f["name"].casefold(),f["barcode"]))
     out="/* Open Food Facts, ODbL, https://world.openfoodfacts.org/; community-contributed nutrition values. */\n"
     out+="globalThis.KaloriPackagedFoods="+json.dumps(ordered,ensure_ascii=False,separators=(",",":"))+";\n"
+    actual_bytes=len(out.encode("utf-8"))
+    if actual_bytes>args.max_bytes:
+        p.error(f"Generated JS is {actual_bytes} bytes, above size budget {args.max_bytes}; reduce --limit or split catalog")
     Path(args.output).write_text(out,encoding="utf-8")
     print(json.dumps({"rows_read":count,"products_exported":len(ordered),
                       "output":args.output},ensure_ascii=False))
