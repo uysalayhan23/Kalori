@@ -48,3 +48,16 @@ py tools/verify_pre_apk.py
 ```
 
 Bu komutlar APK oluşturmaz, GitHub Actions çalıştırmaz. **Çalıştırmadan önce** Open Food Facts'in veri lisansı/atıf yükümlülükleri, tekil besin değerleri, g/ml birimleri ve mağaza metadatası gözden geçirilmelidir. OFF verisi topluluk katkısıdır ve güncel market stok bilgisini kanıtlamaz. İçe aktarıcı sıralı satırları sınıra kadar alır; seçilen ilk 3000 ürünün en iyi, en güncel veya en doğru 3000 kayıt olduğu iddia edilmez.
+
+
+## Tek istekle gerçek Türkiye ürün örneği
+
+Tam TSV dışa aktarımı çok büyük olduğunda, bilgisayarda internet erişimi varsa **yalnız tek OFF API v2 arama isteği** yapan şu komut kullanılabilir:
+
+```powershell
+py tools/fetch_off_turkey_sample.py --page-size 100
+py tools/audit_packaged.py --input packaged-foods.js --min-products 1
+py tools/verify_pre_apk.py --release
+```
+
+Komutun çalışması garanti değildir: API limitleri, erişim engelleri veya geçersiz/eksik besin kayıtları nedeniyle hiç ürün bulunmayabilir. **Önceki çıktı dosyası ürün yoksa korunur.** Kayıtlar `community_reported` durumunda kalır ve kullanıcı etiketiyle karşılaştırılmadan doğrulanmış sayılmaz. Bu yöntem binlerce ürünün aktarılması için uygun değildir; o durumda OFF toplu veri dışa aktarımı kullanılmalıdır. Verinin yeniden dağıtımında ODbL lisans yükümlülükleri incelenmelidir. Sorgu kodu güncel mağaza stoklarını veya belirli perakendecilerin ürün listesini kanıtlamaz.
