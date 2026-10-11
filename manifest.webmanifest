@@ -1,0 +1,11 @@
+{
+  "name": "Kalori – Beslenme Günlüğü",
+  "short_name": "Kalori",
+  "lang": "tr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f8f4",
+  "theme_color": "#174e39",
+  "description": "Çevrimdışı kullanılabilen beslenme günlüğü ve öğün planlama uygulaması"
+}
