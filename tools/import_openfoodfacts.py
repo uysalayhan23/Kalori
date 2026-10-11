@@ -35,7 +35,8 @@ def row_to_product(row):
     if kcal == 0 and any(safe_number(row.get(k),100) not in (None,0) for k in ("proteins_100g","fat_100g","carbohydrates_100g")):return None
     nutrition={key:safe_number(row.get(column),100) for key,column in
                (("protein","proteins_100g"),("fat","fat_100g"),("carbs","carbohydrates_100g"))}
-    # Open Food Facts may describe liquids with per-100g fields; never infer grams from ml.
+    # OFF uses energy-kcal_100g even for drinks; leave liquid quantity interpretation unresolved.
+    # Preserve serving-basis flag so the UI can avoid claiming gram equivalence.
     # Nutrient basis must be inspected against the package before claiming exact matching.
     brand=(row.get("brands") or "").split(",")[0].strip()[:90]
     stores=(row.get("stores") or "").strip()
@@ -46,7 +47,7 @@ def row_to_product(row):
             "quantity":(row.get("quantity") or "")[:80],
             "source":"Open Food Facts","verification":"community_reported",
             "sourceReference":"https://world.openfoodfacts.org/product/"+barcode,
-            "basis":"100 g or 100 ml, as reported by OFF",
+            "basis":"100 g or 100 ml (verify product type/label)",
             "lastModified":(row.get("last_modified_datetime") or "")[:30]}
 
 def run():
