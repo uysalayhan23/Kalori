@@ -33,7 +33,9 @@ def row_to_product(row):
     if kcal == 0 and any(safe_number(row.get(k),100) not in (None,0) for k in ("proteins_100g","fat_100g","carbohydrates_100g")):return None
     nutrition={key:safe_number(row.get(column),100) for key,column in
                (("protein","proteins_100g"),("fat","fat_100g"),("carbs","carbohydrates_100g"))}
-    # Open Food Facts may describe liquids with per-100g fields; never infer grams from ml.\n    # Nutrient basis must be inspected against the package before claiming exact matching.\n    brand=(row.get("brands") or "").split(",")[0].strip()[:90]
+    # Open Food Facts may describe liquids with per-100g fields; never infer grams from ml.
+    # Nutrient basis must be inspected against the package before claiming exact matching.
+    brand=(row.get("brands") or "").split(",")[0].strip()[:90]
     stores=(row.get("stores") or "").strip()
     # 'stores' is crowdsourced historical metadata, NOT verified current availability.
     return {"id":"off-"+barcode,"barcode":barcode,"name":name[:160],
