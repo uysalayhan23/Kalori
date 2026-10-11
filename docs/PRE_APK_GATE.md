@@ -34,3 +34,12 @@ Python 3 zorunludur, Node.js varsa ayrıca JS syntax ve katalog testi yapılır.
 Open Food Facts ODbL ve atıf/paylaşım yükümlülüklerini doğrula. TürKomp verilerini izin olmadan kitlesel kopyalama. Ürünlerin güncel BİM/A101/ŞOK/Migros/CarrefourSA stok durumlarını yalnız marka bilgisinden türetme. Yerel saklamanın güvenli yedekleme eksikleri giderilmelidir.
 
 **Bu dokümanın varlığı APK öncesi tüm işlerin tamamlandığı anlamına gelmez.**
+
+
+## Zorunlu yayın öncesi denetim (2026-10-11)
+
+Geliştirme testi: `py tools/verify_pre_apk.py`.
+
+Daha sıkı yayın kabulü: `py tools/verify_pre_apk.py --release`.
+
+`--release`, paketli ürün kataloğunun sıfır kayıt içermesini açık bir engel sayar. Mevcut `packaged-foods.js` boş olduğu için **şu anda bu kontrolün geçmesi beklenmez**. Başarılı geliştirme testleri, gerçek besin verisi veya Android cihaz QA'sı yerine geçmez. APK oluşturmak ya da Actions kullanmak için izin verilmemiştir.
