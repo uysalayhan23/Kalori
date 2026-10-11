@@ -23,6 +23,19 @@ class ImportIntegrationTests(unittest.TestCase):
             self.assertEqual(next(p for p in products if p["name"]=="Örnek Gofret")["brand"],"Örnek Marka")
             audit=subprocess.run([sys.executable,str(AUDIT),"--input",str(output)],capture_output=True,text=True)
             self.assertEqual(audit.returncode,0,audit.stdout+"\n"+audit.stderr)
+    def test_release_gate_rejects_empty_catalog(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output=Path(tmp)/"packaged-foods.js"
+            output.write_text(PREFIX+"[];\\n",encoding="utf-8")
+            proc=subprocess.run([sys.executable,str(AUDIT),"--input",str(output),"--min-products","1"],capture_output=True,text=True)
+            self.assertNotEqual(proc.returncode,0)
+            self.assertIn("at least 1 required",proc.stdout)
+    def test_release_gate_accepts_valid_fixture(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output=Path(tmp)/"packaged-foods.js"
+            subprocess.run([sys.executable,str(IMPORT),"--input",str(FIXTURE),"--output",str(output)],check=True,capture_output=True)
+            proc=subprocess.run([sys.executable,str(AUDIT),"--input",str(output),"--min-products","1"],capture_output=True,text=True)
+            self.assertEqual(proc.returncode,0,proc.stdout+proc.stderr)
     def test_gzip_dump_import(self):
         with tempfile.TemporaryDirectory() as tmp:
             source=Path(tmp)/"foods.tsv.gz"
