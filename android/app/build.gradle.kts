@@ -8,7 +8,7 @@ val syncKaloriWebAssets by tasks.registering(Sync::class) {
         include(
             "index.html", "foods.html", "meal-builder.html", "profile.html",
             "barcode.html", "history.html", "food-catalog.js",
-            "packaged-foods.js", "manifest.webmanifest", "service-worker.js"
+            "packaged-foods.js", "food-quality.js", "manifest.webmanifest", "service-worker.js"
         )
     }
     into(layout.buildDirectory.dir("generated/kaloriWebAssets"))
