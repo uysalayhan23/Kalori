@@ -27,8 +27,10 @@ def row_to_product(row):
     barcode=(row.get("code") or "").strip()
     name=(row.get("product_name_tr") or row.get("product_name") or "").strip()
     if not re.fullmatch(r"\d{8,14}",barcode) or not name:return None
+    if name.casefold() in ("unknown", "unbekannt", "sans nom", "ürün", "product"):return None
     kcal=safe_number(row.get("energy-kcal_100g"),900)
     if kcal is None:return None
+    if kcal == 0 and any(word in name.casefold() for word in ("gofret","çikolata","bisküvi","cips","kraker","kek","wafer","chocolate","biscuit","chips")):return None
     # Explicitly filter missing / impossible high values, without inventing values.
     if kcal == 0 and any(safe_number(row.get(k),100) not in (None,0) for k in ("proteins_100g","fat_100g","carbohydrates_100g")):return None
     nutrition={key:safe_number(row.get(column),100) for key,column in
@@ -56,7 +58,7 @@ def run():
     args=p.parse_args()
     if not 1<=args.limit<=300000:p.error("limit out of range")
     if not 1024<=args.max_bytes<=100_000_000:p.error("max-bytes out of range")
-    products={};count=0
+    products={};count=0;rejected=0
     with open(args.input,encoding="utf-8",newline="") as fh:
         rows=csv.DictReader(fh,delimiter="\t")
         if not {"code","countries_tags","energy-kcal_100g"}.issubset(rows.fieldnames or []):
@@ -65,6 +67,7 @@ def run():
             count+=1
             f=row_to_product(row)
             if f:products[f["barcode"]]=f
+            else:rejected+=1
             if len(products)>=args.limit:break
     ordered=sorted(products.values(),key=lambda f:(f["name"].casefold(),f["barcode"]))
     out="/* Open Food Facts, ODbL, https://world.openfoodfacts.org/; community-contributed nutrition values. */\n"
@@ -73,6 +76,6 @@ def run():
     if actual_bytes>args.max_bytes:
         p.error(f"Generated JS is {actual_bytes} bytes, above size budget {args.max_bytes}; reduce --limit or split catalog")
     Path(args.output).write_text(out,encoding="utf-8")
-    print(json.dumps({"rows_read":count,"products_exported":len(ordered),
+    print(json.dumps({"rows_read":count,"rows_rejected":rejected,"products_exported":len(ordered),
                       "output":args.output},ensure_ascii=False))
 if __name__=="__main__":run()
