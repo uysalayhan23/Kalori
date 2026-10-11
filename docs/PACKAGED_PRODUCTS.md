@@ -35,3 +35,16 @@ Open Food Facts — https://world.openfoodfacts.org/data — veritabanı ODbL li
 ## Mevcut durum
 
 `packaged-foods.js` şu anda **boş bir başlangıç dosyasıdır**. İçe aktarma aracı hazırdır ama gerçek dışa aktarım henüz indirilip işlenmedi. Dolayısıyla eklenmiş doğrulanmış market ürünü sayısı **0**; başlangıç 195 yemek/besin kaydı korunur.
+
+
+## Büyük sıkıştırılmış veriler (2026-10-11)
+
+OFF TSV dışa aktarımı `.csv.gz` olarak indirilmişse dosyayı önceden açmak gerekmez:
+
+```powershell
+py tools/import_openfoodfacts.py --input en.openfoodfacts.org.products.csv.gz --output packaged-foods.js --limit 3000 --max-bytes 5000000
+py tools/audit_packaged.py --input packaged-foods.js
+py tools/verify_pre_apk.py
+```
+
+Bu komutlar APK oluşturmaz, GitHub Actions çalıştırmaz. **Çalıştırmadan önce** Open Food Facts'in veri lisansı/atıf yükümlülükleri, tekil besin değerleri, g/ml birimleri ve mağaza metadatası gözden geçirilmelidir. OFF verisi topluluk katkısıdır ve güncel market stok bilgisini kanıtlamaz. İçe aktarıcı sıralı satırları sınıra kadar alır; seçilen ilk 3000 ürünün en iyi, en güncel veya en doğru 3000 kayıt olduğu iddia edilmez.
