@@ -3,12 +3,12 @@
 
 Usage:
   python tools/import_openfoodfacts.py --input en.openfoodfacts.org.products.csv --output packaged-foods.js
-The OFF export file is tab-separated (despite the .csv extension). No network or pip.
+The OFF export file is tab-separated (despite the .csv extension); .gz is supported. No network or pip.
 Only rows tagged as Turkey, with a real product name, barcode and reported kcal/100 g
 (or kcal/100 ml) are retained. Do not infer a store from a brand.
 License: Open Food Facts ODbL; attribution/share-alike obligations apply.
 """
-import argparse,csv,json,re,sys
+import argparse,csv,json,re,sys,gzip
 from pathlib import Path
 
 FIELDS=("code","product_name_tr","product_name","brands","stores","countries_tags",
@@ -60,7 +60,8 @@ def run():
     if not 1<=args.limit<=300000:p.error("limit out of range")
     if not 1024<=args.max_bytes<=100_000_000:p.error("max-bytes out of range")
     products={};count=0;rejected=0
-    with open(args.input,encoding="utf-8",newline="") as fh:
+    opener=gzip.open if str(args.input).lower().endswith(".gz") else open
+    with opener(args.input,mode="rt",encoding="utf-8",newline="") as fh:
         rows=csv.DictReader(fh,delimiter="\t")
         if not {"code","countries_tags","energy-kcal_100g"}.issubset(rows.fieldnames or []):
             p.error("Wrong format or missing required Open Food Facts TSV columns")
