@@ -26,7 +26,7 @@ class ImportIntegrationTests(unittest.TestCase):
     def test_release_gate_rejects_empty_catalog(self):
         with tempfile.TemporaryDirectory() as tmp:
             output=Path(tmp)/"packaged-foods.js"
-            output.write_text(PREFIX+"[];\\n",encoding="utf-8")
+            output.write_text(PREFIX+"[];",encoding="utf-8")
             proc=subprocess.run([sys.executable,str(AUDIT),"--input",str(output),"--min-products","1"],capture_output=True,text=True)
             self.assertNotEqual(proc.returncode,0)
             self.assertIn("at least 1 required",proc.stdout)
