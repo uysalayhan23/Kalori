@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """End-to-end OFF import and audit checks using synthetic rows. Never makes network calls."""
-import json,subprocess,sys,tempfile,unittest
+import json,subprocess,sys,tempfile,unittest,gzip
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 IMPORT=ROOT/"tools"/"import_openfoodfacts.py"
@@ -23,6 +23,16 @@ class ImportIntegrationTests(unittest.TestCase):
             self.assertEqual(next(p for p in products if p["name"]=="Örnek Gofret")["brand"],"Örnek Marka")
             audit=subprocess.run([sys.executable,str(AUDIT),"--input",str(output)],capture_output=True,text=True)
             self.assertEqual(audit.returncode,0,audit.stdout+"\n"+audit.stderr)
+    def test_gzip_dump_import(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source=Path(tmp)/"foods.tsv.gz"
+            output=Path(tmp)/"packaged-foods.js"
+            with gzip.open(source,"wb") as handle:
+                handle.write(FIXTURE.read_bytes())
+            proc=subprocess.run([sys.executable,str(IMPORT),"--input",str(source),"--output",str(output)],capture_output=True,text=True)
+            self.assertEqual(proc.returncode,0,proc.stderr)
+            rows=json.loads(output.read_text(encoding="utf-8").split(PREFIX,1)[1].strip().removesuffix(";"))
+            self.assertEqual(len(rows),2)
     def test_size_limit_rejects_output(self):
         with tempfile.TemporaryDirectory() as tmp:
             output=Path(tmp)/"packaged-foods.js"
