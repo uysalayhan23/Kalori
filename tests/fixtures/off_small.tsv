@@ -1,0 +1,6 @@
+code	product_name_tr	product_name	brands	stores	countries_tags	energy-kcal_100g	proteins_100g	fat_100g	carbohydrates_100g	quantity	last_modified_datetime
+8691234567890	Örnek Gofret		Örnek Marka	Deneme Market	en:turkey	490	7.2	21	68	45 g	2026-01-01
+8691234567891	Örnek Kraker		Örnek Marka		en:france	430	8	12	70	75 g	2026-01-01
+8691234567892	Örnek Yoğurt		Örnek Marka		en:turkey	60	3.4	3.2	4.5	200 g	2026-01-01
+8691234567893	Eksik Kalori		Örnek Marka		en:turkey		3	4	5	70 g	2026-01-01
+8691234567894	Tutarsız Sıfır		Örnek Marka		en:turkey	0	3	4	5	70 g	2026-01-01
