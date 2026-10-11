@@ -4,7 +4,7 @@ import argparse,json,re,sys
 from pathlib import Path
 
 PREFIX="globalThis.KaloriPackagedFoods="
-def audit(path,max_bytes=5_000_000):
+def audit(path,max_bytes=5_000_000,min_products=0):
     raw=Path(path).read_text(encoding="utf-8")
     pos=raw.find(PREFIX)
     if pos<0:raise ValueError("Expected generated KaloriPackagedFoods assignment")
@@ -33,6 +33,7 @@ def audit(path,max_bytes=5_000_000):
                 errors.append(str(i)+": invalid "+key)
         if all(isinstance(p.get(k),(int,float)) for k in ("protein","fat","carbs")):
             counts["macros_complete"]+=1
+    if len(entries)<min_products:errors.append(f"Catalog has {len(entries)} products; at least {min_products} required")
     counts["file_bytes"]=Path(path).stat().st_size
     if counts["file_bytes"]>max_bytes:errors.append("APK/web size budget exceeded")
     if counts["barcode_duplicates"]:errors.append("duplicate barcodes")
@@ -41,7 +42,9 @@ def audit(path,max_bytes=5_000_000):
 def main():
     p=argparse.ArgumentParser();p.add_argument("--input",default="packaged-foods.js")
     p.add_argument("--max-bytes",type=int,default=5_000_000);args=p.parse_args()
-    counts,errors=audit(args.input,args.max_bytes)
+    p.add_argument("--min-products",type=int,default=0,help="For release gating; default 0 to permit empty development catalogs")
+    if args.min_products<0:p.error("min-products must be nonnegative")
+    counts,errors=audit(args.input,args.max_bytes,args.min_products)
     print(json.dumps({"counts":counts,"errors":errors[:40],"error_count":len(errors)},ensure_ascii=False,indent=2))
     return 1 if errors else 0
 if __name__=="__main__":sys.exit(main())
