@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Run the Kalori pre-APK checks locally. Never invokes GitHub Actions or builds an APK."""
 from pathlib import Path
-import subprocess,sys,json,shutil
+import subprocess,sys,json,shutil,argparse
 
 ROOT=Path(__file__).resolve().parents[1]
+parser=argparse.ArgumentParser(description="Local pre-APK checks; never builds APK")
+parser.add_argument("--release",action="store_true",help="Block if real packaged catalog is empty")
+args=parser.parse_args()
 required=["index.html","foods.html","meal-builder.html","profile.html","barcode.html","history.html",
           "food-catalog.js","packaged-foods.js","manifest.webmanifest","service-worker.js",
           "tools/import_openfoodfacts.py","tools/import_usda.py","tools/audit_packaged.py"]
