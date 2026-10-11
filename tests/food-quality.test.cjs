@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const src=fs.readFileSync(require('node:path').join(__dirname,'..','food-quality.js'),'utf8');
+const ctx={globalThis:{}};
+vm.runInNewContext(src,ctx);
+const quality=ctx.globalThis.KaloriFoodQuality;
+const liquid={source:'Open Food Facts',barcode:'8690574114528',name:'Pepsi',quantity:'2,5 L'};
+assert.equal(quality.blocksGrams(liquid),true,'liquid must not receive unverified gram calculations');
+assert.match(quality.warning(liquid),/100 g \/ 100 ml/);
+assert.equal(quality.blocksGrams({...liquid,quantity:'200 ml'}),true);
+assert.equal(quality.blocksGrams({...liquid,quantity:'500g'}),false);
+assert.equal(quality.blocksGrams({source:'user',quantity:'1 L'}),false);
+assert.match(quality.warning({source:'Open Food Facts',barcode:'8680908020014',quantity:'75 g'}),/tutarsız/);
+assert.equal(quality.warning({source:'Open Food Facts',barcode:'8690504034506',quantity:'40 g'}),'');
+console.log('PASS: food-quality liquid-unit guards and anomaly warnings.');
