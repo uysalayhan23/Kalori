@@ -37,6 +37,16 @@ class OFFTests(unittest.TestCase):
     def test_missing_macro_preserved_null(self):
         row=self.valid();row["fat_100g"]=""
         self.assertIsNone(row_to_product(row)["fat"])
+    def test_zero_energy_chocolate_rejected(self):
+        row=self.valid();row["product_name_tr"]="Çikolata";row["energy-kcal_100g"]="0"
+        self.assertIsNone(row_to_product(row))
+    def test_generic_unknown_name_rejected(self):
+        row=self.valid();row["product_name_tr"]="unknown"
+        self.assertIsNone(row_to_product(row))
+    def test_valid_zero_energy_water_allowed(self):
+        row=self.valid();row["product_name_tr"]="Su";row["energy-kcal_100g"]="0"
+        row["proteins_100g"]="0";row["fat_100g"]="0";row["carbohydrates_100g"]="0"
+        self.assertEqual(row_to_product(row)["kcal"],0)
     def test_bad_barcode_rejected(self):
         row=self.valid();row["code"]="bad"
         self.assertIsNone(row_to_product(row))
