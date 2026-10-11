@@ -50,7 +50,7 @@ if shutil.which("node"):
         if result.returncode:failures.append("Node check failed: "+file)
 else:
     print("NOT RUN: Node.js JS syntax/catalog tests (Node.js unavailable)")
-result=subprocess.run([sys.executable,"tools/audit_packaged.py","--input","packaged-foods.js"],cwd=ROOT)
+result=subprocess.run([sys.executable,"tools/audit_packaged.py","--input","packaged-foods.js"]+(["--min-products","1"] if args.release else []),cwd=ROOT)
 if result.returncode:failures.append("Packaged-food data audit failed")
 if failures:
     print("PRE-APK BLOCKED:",json.dumps(failures,ensure_ascii=False,indent=2))
