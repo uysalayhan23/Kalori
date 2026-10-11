@@ -4,7 +4,7 @@ from pathlib import Path
 import subprocess,sys,json,shutil
 
 ROOT=Path(__file__).resolve().parents[1]
-required=["index.html","foods.html","meal-builder.html","profile.html","barcode.html",
+required=["index.html","foods.html","meal-builder.html","profile.html","barcode.html","history.html",
           "food-catalog.js","packaged-foods.js","manifest.webmanifest","service-worker.js",
           "tools/import_openfoodfacts.py","tools/import_usda.py","tools/audit_packaged.py"]
 failures=[]
@@ -14,7 +14,7 @@ try:
     manifest=json.loads((ROOT/"manifest.webmanifest").read_text(encoding="utf-8"))
     if manifest.get("start_url")!="./index.html":failures.append("Unexpected start_url")
 except (ValueError,OSError) as exc:failures.append("Manifest invalid: "+str(exc))
-pages=["index.html","foods.html","meal-builder.html","profile.html","barcode.html"]
+pages=["index.html","foods.html","meal-builder.html","profile.html","barcode.html","history.html"]
 for name in pages:
     try:
         html=(ROOT/name).read_text(encoding="utf-8")
