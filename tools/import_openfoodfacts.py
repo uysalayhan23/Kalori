@@ -8,7 +8,7 @@ Only rows tagged as Turkey, with a real product name, barcode and reported kcal/
 (or kcal/100 ml) are retained. Do not infer a store from a brand.
 License: Open Food Facts ODbL; attribution/share-alike obligations apply.
 """
-import argparse,csv,json,re,sys,datetime
+import argparse,csv,json,re,sys
 from pathlib import Path
 
 FIELDS=("code","product_name_tr","product_name","brands","stores","countries_tags",
@@ -22,7 +22,7 @@ def safe_number(raw, max_value):
     except (TypeError,ValueError):return None
 
 def row_to_product(row):
-    countries=(row.get("countries_tags") or "").lower().split(",")
+    countries=[x.strip() for x in (row.get("countries_tags") or "").lower().split(",")]
     if "en:turkey" not in countries and "tr:turkiye" not in countries:return None
     barcode=(row.get("code") or "").strip()
     name=(row.get("product_name_tr") or row.get("product_name") or "").strip()
@@ -33,7 +33,7 @@ def row_to_product(row):
     if kcal == 0 and any(safe_number(row.get(k),100) not in (None,0) for k in ("proteins_100g","fat_100g","carbohydrates_100g")):return None
     nutrition={key:safe_number(row.get(column),100) for key,column in
                (("protein","proteins_100g"),("fat","fat_100g"),("carbs","carbohydrates_100g"))}
-    brand=(row.get("brands") or "").split(",")[0].strip()[:90]
+    # Open Food Facts may describe liquids with per-100g fields; never infer grams from ml.\n    # Nutrient basis must be inspected against the package before claiming exact matching.\n    brand=(row.get("brands") or "").split(",")[0].strip()[:90]
     stores=(row.get("stores") or "").strip()
     # 'stores' is crowdsourced historical metadata, NOT verified current availability.
     return {"id":"off-"+barcode,"barcode":barcode,"name":name[:160],
