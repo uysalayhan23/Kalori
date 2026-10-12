@@ -29,11 +29,12 @@ handlers.install(install);
 (async()=>{
  await install.promise;
  const route='https://example.test/app/index.html';
- let promise;
- handlers.fetch({request:{method:'GET',url:route},waitUntil(){},respondWith(p){promise=p}});
+ let promise;let updates=[];
+ handlers.fetch({request:{method:'GET',url:route},waitUntil(p){updates.push(p)},respondWith(p){promise=p}});
  assert.equal((await promise).source,'network','online uses current file');
+ await Promise.all(updates);
  online=false;
- handlers.fetch({request:{method:'GET',url:route},waitUntil(){},respondWith(p){promise=p}});
+ handlers.fetch({request:{method:'GET',url:route},waitUntil(p){updates.push(p)},respondWith(p){promise=p}});
  assert.equal((await promise).source,'network','offline uses cached current file');
  promise=undefined;
  handlers.fetch({request:{method:'GET',url:'https://example.test/api/v2/search'},respondWith(p){promise=p}});
