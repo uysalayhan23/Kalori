@@ -102,6 +102,9 @@ public class MainActivity extends Activity {
         super.onActivityResult(requestCode,resultCode,data);
         if(requestCode==BACKUP_SAVE_REQUEST){
             String json=pendingBackup;pendingBackup=null;
+            if(resultCode==RESULT_OK && data!=null && data.getData()!=null && json==null){
+                Toast.makeText(this,"Uygulama yeniden açıldığı için yedekleme tamamlanamadı. Lütfen yeniden deneyin.",Toast.LENGTH_LONG).show();
+            }
             if(resultCode==RESULT_OK && data!=null && data.getData()!=null && json!=null){
                 try(OutputStream stream=getContentResolver().openOutputStream(data.getData(),"w")){
                     if(stream==null)throw new IOException("No output stream");
@@ -116,6 +119,8 @@ public class MainActivity extends Activity {
             Uri uri=resultCode==RESULT_OK&&data!=null?data.getData():null;
             uploadCallback.onReceiveValue(uri==null?null:new Uri[]{uri});
             uploadCallback=null;
+        } else if(resultCode==RESULT_OK){
+            Toast.makeText(this,"Dosya seçimi uygulama yeniden açıldığı için tamamlanamadı. Tekrar seçin.",Toast.LENGTH_LONG).show();
         }
     }
     @Override public void onBackPressed() {
