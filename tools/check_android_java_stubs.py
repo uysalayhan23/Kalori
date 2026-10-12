@@ -64,5 +64,7 @@ def main():
         if result.returncode:
             print(result.stderr,file=sys.stderr)
             raise SystemExit(result.returncode)
+        expected=base/"classes/com/kalori/journal/MainActivity.class"
+        if not expected.is_file():raise SystemExit("FAIL: javac returned success but MainActivity.class was not generated")
         print("PASS: MainActivity.java javac --release 17 with temporary Android API stubs; no SDK, Gradle or APK.")
 if __name__=="__main__":main()
