@@ -55,6 +55,11 @@ if shutil.which("javac"):
     if result.returncode:failures.append("Android stub javac compilation failed")
 else:
     print("NOT RUN: Android stub javac compilation (javac unavailable)")
+if shutil.which("java") and shutil.which("javac"):
+    result=subprocess.run([sys.executable,"tools/test_android_activity_behavior.py"],cwd=ROOT)
+    if result.returncode:failures.append("Android Activity behavioral Java tests failed")
+else:
+    print("NOT RUN: Android Activity behavioral Java tests (toolchain unavailable)")
 result=subprocess.run([sys.executable,"tools/audit_packaged.py","--input","packaged-foods.js"]+(["--min-products","1"] if args.release else []),cwd=ROOT)
 if result.returncode:failures.append("Packaged-food data audit failed")
 if failures:
