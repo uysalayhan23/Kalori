@@ -27,7 +27,7 @@ public class ContentResolver {public OutputStream openOutputStream(Uri uri,Strin
 "android/net/Uri.java":"""package android.net;public class Uri {public String getScheme(){return null;}public String toString(){return "";}}""",
 "android/util/Log.java":"""package android.util;public class Log {public static int e(String t,String m,Throwable x){return 0;}public static int w(String t,String m){return 0;}}""",
 "android/widget/Toast.java":"""package android.widget;import android.app.Activity;
-public class Toast {public static final int LENGTH_LONG=1,LENGTH_SHORT=0;public static Toast makeText(Activity a,String s,int len){return new Toast();}public void show(){}}""",
+public class Toast {public static final int LENGTH_LONG=1,LENGTH_SHORT=0;public static final java.util.List<String> messages=new java.util.ArrayList<>();private String message;public static Toast makeText(Activity a,String s,int len){Toast t=new Toast();t.message=s;return t;}public void show(){messages.add(message);}}""",
 "android/webkit/JavascriptInterface.java":"""package android.webkit;@java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)public @interface JavascriptInterface {}""",
 "android/webkit/ValueCallback.java":"""package android.webkit;public interface ValueCallback<T>{void onReceiveValue(T value);}""",
 "android/webkit/WebSettings.java":"""package android.webkit;public class WebSettings {
