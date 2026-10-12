@@ -8,7 +8,7 @@ parser=argparse.ArgumentParser(description="Local pre-APK checks; never builds A
 parser.add_argument("--release",action="store_true",help="Block if real packaged catalog is empty")
 args=parser.parse_args()
 required=["index.html","foods.html","meal-builder.html","profile.html","barcode.html","history.html",
-          "food-catalog.js","packaged-foods.js","food-quality.js","manifest.webmanifest","service-worker.js",
+          "food-catalog.js","packaged-foods.js","food-quality.js","journal-data.js","manifest.webmanifest","service-worker.js",
           "tools/import_openfoodfacts.py","tools/import_usda.py","tools/audit_packaged.py"]
 failures=[]
 android_files=[
@@ -41,7 +41,7 @@ command=[sys.executable,"-m","unittest","discover","-s","tests","-p","test_*.py"
 proc=subprocess.run(command,cwd=ROOT)
 if proc.returncode:failures.append("Python unittest failed")
 if shutil.which("node"):
-    for file in ["food-catalog.js","packaged-foods.js","food-quality.js","service-worker.js","tests/catalog.test.cjs","tests/food-quality.test.cjs","tests/service-worker.test.cjs"]:
+    for file in ["food-catalog.js","packaged-foods.js","food-quality.js","journal-data.js","service-worker.js","tests/catalog.test.cjs","tests/food-quality.test.cjs","tests/service-worker.test.cjs","tests/journal-data.test.cjs"]:
         if file.endswith(".test.cjs"):
             cmd=["node",file]
         else:
