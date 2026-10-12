@@ -17,6 +17,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.webkit.ValueCallback;
+import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -72,6 +73,7 @@ public final class ActivityBehaviorHarness {
 
    set(a,"pendingBackup","{\"entries\":[],\"water\":{}}");
    a.handle(302,-1,document());
+   check(Toast.messages.get(Toast.messages.size()-1).contains("kaydedildi"),"backup success toast missing");
    check(a.opened==1 && a.closed==1,"successful backup must close stream");
    check(a.contents.size()>0,"backup must write bytes");
    check(get(a,"pendingBackup")==null,"backup must release payload");
@@ -79,18 +81,21 @@ public final class ActivityBehaviorHarness {
    a.failWrite=true;
    set(a,"pendingBackup","{\"entries\":[],\"water\":{}}");
    a.handle(302,-1,document());
+   check(Toast.messages.get(Toast.messages.size()-1).contains("kaydedilemedi"),"write failure must show error, not success");
    check(a.opened==2 && a.closed==2,"failed write must close stream");
    check(get(a,"pendingBackup")==null,"write failure must release payload");
 
    a.failWrite=false;a.failClose=true;
    set(a,"pendingBackup","{\"entries\":[],\"water\":{}}");
    a.handle(302,-1,document());
+   check(Toast.messages.get(Toast.messages.size()-1).contains("kaydedilemedi"),"close failure must show error, not success");
    check(a.opened==3 && a.closed==3,"close failure must be attempted");
    check(get(a,"pendingBackup")==null,"close failure must release payload");
 
    CheckActivity recreated=new CheckActivity();
    recreated.handle(302,-1,document());
    check(recreated.opened==0,"recreated Activity must not write missing backup");
+   check(Toast.messages.get(Toast.messages.size()-1).contains("yeniden"),"recreated Activity must warn user");
    System.out.println("PASS: picker cancel, backup cancel, successful write, write/close errors and recreation.");
  }
 }
