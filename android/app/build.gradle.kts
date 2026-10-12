@@ -2,6 +2,7 @@ import org.gradle.api.tasks.Sync
 
 plugins { id("com.android.application") }
 
+val generatedKaloriWebAssets = layout.buildDirectory.dir("generated/kaloriWebAssets")
 val syncKaloriWebAssets by tasks.registering(Sync::class) {
     val webRoot = rootProject.projectDir.parentFile
     from(webRoot) {
@@ -11,7 +12,7 @@ val syncKaloriWebAssets by tasks.registering(Sync::class) {
             "packaged-foods.js", "food-quality.js", "journal-data.js", "manifest.webmanifest", "service-worker.js"
         )
     }
-    into(layout.buildDirectory.dir("generated/kaloriWebAssets"))
+    into(generatedKaloriWebAssets)
 }
 
 android {
@@ -28,5 +29,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    sourceSets.getByName("main").assets.srcDir(syncKaloriWebAssets)
+    sourceSets.getByName("main").assets.srcDir(generatedKaloriWebAssets)
+}
+
+// The generated source directory by itself does not reliably schedule the Sync task.
+// Merge tasks must wait until the offline HTML/JS assets have actually been copied.
+tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }.configureEach {
+    dependsOn(syncKaloriWebAssets)
 }
