@@ -1,0 +1,18 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.join(__dirname,'..');
+const runner=fs.readFileSync(path.join(root,'tools/check_android_java_stubs.py'),'utf8');
+const verify=fs.readFileSync(path.join(root,'tools/verify_pre_apk.py'),'utf8');
+const java=fs.readFileSync(path.join(root,'android/app/src/main/java/com/kalori/journal/MainActivity.java'),'utf8');
+assert.match(runner,/TemporaryDirectory\(/);
+assert.match(runner,/shutil\.which\("javac"\)/);
+assert.match(runner,/"--release","17"/);
+assert.match(runner,/str\(SOURCE\)/);
+assert.match(runner,/android\/webkit\/WebView\.java/);
+assert.match(runner,/org\/json\/JSONObject\.java/);
+assert.match(verify,/check_android_java_stubs\.py/);
+assert.match(java,/void onActivityResult\(/);
+assert.match(java,/void onSaveInstanceState\(/);
+assert.doesNotMatch(runner,/gradlew|assembleDebug|assembleRelease|\.apk/);
+console.log('PASS: repeatable javac stub test wiring and no APK invocation (source contract only).');
