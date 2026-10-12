@@ -1,7 +1,6 @@
 """SDK-free javac regression: exit failures and missing class output must block."""
 import importlib.util
 from pathlib import Path
-import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -27,6 +26,16 @@ class JavaStubToolTests(unittest.TestCase):
         with patch.object(tool.shutil,"which",return_value="/fake/javac"),patch.object(tool.subprocess,"run",return_value=Result()):
             with self.assertRaises(SystemExit) as ctx:tool.main()
         self.assertIn("MainActivity.class was not generated",str(ctx.exception))
+
+    def test_invalid_java_source_rejected_by_real_javac(self):
+        if not tool.shutil.which("javac"):self.skipTest("javac not installed")
+        import tempfile
+        with tempfile.TemporaryDirectory(prefix="kalori-invalid-java-") as directory:
+            source=Path(directory)/"MainActivity.java"
+            source.write_text("package com.kalori.journal; public class MainActivity { this is invalid Java; }",encoding="utf-8")
+            with patch.object(tool,"SOURCE",source):
+                with self.assertRaises(SystemExit) as ctx:tool.main()
+            self.assertEqual(ctx.exception.code,1)
 
     def test_real_javac_if_available(self):
         if not tool.shutil.which("javac"):self.skipTest("javac not installed")
