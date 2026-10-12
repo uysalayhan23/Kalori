@@ -1,0 +1,35 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const files=['index.html','meal-builder.html','history.html'];
+for(const name of files){
+ const html=fs.readFileSync(path.join(root,name),'utf8');
+ const scripts=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)];
+ for(const script of scripts)new Function(script[1]);
+ const required=['journal-data.js'];
+ for(const src of required)assert.ok(html.includes('<script src="'+src+'"></script>'),name+': '+src+' script missing');
+ assert.ok(html.indexOf('src="journal-data.js"')<html.indexOf('KaloriJournal.'),name+': journal dependency loads too late');
+ assert.ok(html.includes('serviceWorker.register'),name+': missing offline registration');
+}
+const home=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const meals=fs.readFileSync(path.join(root,'meal-builder.html'),'utf8');
+const history=fs.readFileSync(path.join(root,'history.html'),'utf8');
+assert.match(home,/KaloriJournal\.add\(db,entry\)/);
+assert.match(home,/KaloriJournal\.remove\(db,e\.id\)/);
+assert.match(home,/KaloriJournal\.water\(db,d,1\)/);
+assert.match(home,/KaloriJournal\.water\(db,d,-1\)/);
+assert.match(home,/KaloriJournal\.valid\(restored\)/);
+assert.match(home,/if\(!saveData\(next\)\)return/);
+assert.match(meals,/KaloriJournal\.read\(localStorage\)/);
+assert.match(meals,/KaloriJournal\.write\(localStorage,data\)/);
+assert.match(history,/KaloriJournal\.read\(localStorage\)/);
+const sw=fs.readFileSync(path.join(root,'service-worker.js'),'utf8');
+assert.ok(sw.includes('"./journal-data.js"'),'journal library must work offline');
+const gradle=fs.readFileSync(path.join(root,'android/app/build.gradle.kts'),'utf8');
+assert.ok(gradle.includes('"journal-data.js"'),'journal library must be packaged into Android assets');
+const android=fs.readFileSync(path.join(root,'android/app/src/main/java/com/kalori/journal/MainActivity.java'),'utf8');
+assert.match(android,/setJavaScriptEnabled\(true\)/);
+assert.match(android,/setDomStorageEnabled\(true\)/);
+assert.match(android,/setAllowUniversalAccessFromFileURLs\(false\)/);
+console.log('PASS: three-screen inline syntax, journal interactions, offline assets and Android source contracts.');
