@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const java=fs.readFileSync(path.join(__dirname,'../android/app/src/main/java/com/kalori/journal/MainActivity.java'),'utf8');
+assert.match(java,/void onSaveInstanceState\(Bundle outState\)/);
+assert.match(java,/view\.saveState\(webState\)/);
+assert.doesNotMatch(java,/outState\.putString\([^\n]*pendingBackup/);
+assert.match(java,/if\(resultCode==RESULT_OK && data!=null && data\.getData\(\)!=null && json==null\)/);
+assert.match(java,/Uygulama yeniden açıldığı için yedekleme tamamlanamadı/);
+assert.match(java,/else if\(resultCode==RESULT_OK\)\{\s*Toast\.makeText\(this,"Dosya seçimi/);
+assert.match(java,/uploadCallback\.onReceiveValue\(null\);uploadCallback=null/);
+assert.match(java,/pendingBackup=null/);
+assert.match(java,/view\.removeJavascriptInterface\("KaloriAndroid"\)/);
+assert.match(java,/if\(stream==null\)throw new IOException/);
+assert.ok(java.indexOf('stream.write(json.getBytes')<java.indexOf('"JSON yedeği kaydedildi."'));
+console.log('PASS: recreated Activity cancels lost picker/backup with feedback; backup content not saved to Bundle.');
