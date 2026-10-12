@@ -28,4 +28,7 @@ assert.match(java,/try\(OutputStream stream=/);
 assert.match(java,/uploadCallback\.onReceiveValue\(uri==null\?null:new Uri\[\]\{uri\}\)/);
 assert.match(java,/if\(uploadCallback!=null\)\{uploadCallback\.onReceiveValue\(null\)/);
 assert.ok(java.indexOf('stream.write(json.getBytes')<java.indexOf('JSON yedeği kaydedildi.'),'success notification must follow write');
+assert.match(java,/boolean saved=false/);
+assert.match(java,/if\(saved\)Toast\.makeText\(this,"JSON yedeği kaydedildi\./);
+assert.ok(java.indexOf('if(saved)Toast.makeText')>java.indexOf('catch(Exception error){android.util.Log.e("Kalori","Backup export failed"'),'success must be shown after try-with-resources completes');
 console.log('PASS: manifest, Gradle asset wiring, file selection and backup write ordering contracts.');
