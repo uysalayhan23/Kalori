@@ -77,5 +77,17 @@ async function scenario(failWrite=false,initial=null,restoreFile=null){
  assert.equal(failedRestore.backing.get(journal.KEY),previous,'failed restore preserves disk');
  assert.equal(failedRestore.get('count').textContent,2,'failed restore preserves UI'); // one existing plus scenario meal
  assert.match(failedRestore.get('feedback').textContent,/değiştirilmedi/);
+ const racing=await scenario(false);
+ let resolveFile;
+ const deferred=new Promise(resolve=>{resolveFile=resolve});
+ racing.get('restoreFile').files=[{size:100,text:()=>deferred}];
+ const pendingRestore=racing.get('restore').click();
+ const concurrent=journal.add(journal.read(racing.store),{id:'concurrent',day:'2026-10-12',food:'Eşzamanlı kayıt'});
+ journal.write(racing.store,concurrent);
+ const afterConcurrent=racing.backing.get(journal.KEY);
+ resolveFile(JSON.stringify({entries:[],water:{}}));
+ await pendingRestore;
+ assert.equal(racing.backing.get(journal.KEY),afterConcurrent,'restore race must preserve newer record');
+ assert.match(racing.get('feedback').textContent,/başka bir ekranda değişti/);
  console.log('PASS: UI meal add/delete, water, invalid/valid/failed restore and quota consistency.');
 })().catch(e=>{console.error(e);process.exitCode=1});
