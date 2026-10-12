@@ -45,7 +45,16 @@ function open(name){
  assert.equal(builder.get('items').children.length,1,'failed save must retain pending meal');
  assert.equal(backing.has(journal.KEY),false,'failed save must not create journal');
  writable=true;
+ let reentered=false;
+ const originalSet=storage.setItem;
+ storage.setItem=(key,value)=>{
+  if(key===journal.KEY&&!reentered){reentered=true;builder.get('save').click()}
+  return originalSet.call(storage,key,value);
+ };
  builder.get('save').click();
+ storage.setItem=originalSet;
+ assert.equal(reentered,true,'simulate rapid nested double save');
+ assert.equal(journal.read(storage).entries.length,1,'double-save must not duplicate meal');
  assert.match(builder.get('message').textContent,/kaydedildi/);
  assert.equal(builder.get('items').children.length,1,'empty meal placeholder after save');
  let rows=journal.read(storage).entries;
