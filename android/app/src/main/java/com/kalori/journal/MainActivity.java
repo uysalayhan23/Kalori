@@ -110,8 +110,9 @@ public class MainActivity extends Activity {
                 try(OutputStream stream=getContentResolver().openOutputStream(data.getData(),"w")){
                     if(stream==null)throw new IOException("No output stream");
                     stream.write(json.getBytes(StandardCharsets.UTF_8));
-                    saved=true;
-                }catch(Exception error){android.util.Log.e("Kalori","Backup export failed",error);Toast.makeText(this,"Yedek kaydedilemedi. Farklı bir dosya konumu deneyin.",Toast.LENGTH_LONG).show();}
+                }
+                catch(Exception error){android.util.Log.e("Kalori","Backup export failed",error);Toast.makeText(this,"Yedek kaydedilemedi. Farklı bir dosya konumu deneyin.",Toast.LENGTH_LONG).show();return;}
+                saved=true;
                 if(saved)Toast.makeText(this,"JSON yedeği kaydedildi.",Toast.LENGTH_SHORT).show();
             }
             return;
