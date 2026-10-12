@@ -10,10 +10,17 @@ import android.webkit.WebSettings;
 import android.webkit.WebResourceRequest;
 import android.content.Intent;
 import android.net.Uri;
+import android.webkit.JavascriptInterface;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 public class MainActivity extends Activity {
     private WebView view;
     private static final int FILE_PICKER_REQUEST=301;
+    private static final int BACKUP_SAVE_REQUEST=302;
+    private String pendingBackup;
     private ValueCallback<Uri[]> uploadCallback;
     private static final String ASSET_ORIGIN = "file:///android_asset/";
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -22,9 +29,28 @@ public class MainActivity extends Activity {
         view.getSettings().setJavaScriptEnabled(true);
         view.getSettings().setDomStorageEnabled(true);
         view.getSettings().setAllowFileAccess(true);
-        view.getSettings().setAllowContentAccess(false);
+        view.getSettings().setAllowContentAccess(true);
         view.getSettings().setAllowFileAccessFromFileURLs(false);
         view.getSettings().setAllowUniversalAccessFromFileURLs(false);
+        view.addJavascriptInterface(new Object() {
+            @JavascriptInterface public void saveBackup(String json) {
+                if(json==null || json.length()>5_000_000)return;
+                try {
+                    JSONObject value=new JSONObject(json);
+                    if(!(value.opt("entries") instanceof JSONArray) || !(value.opt("water") instanceof JSONObject))return;
+                } catch(Exception error){return;}
+                runOnUiThread(()->{
+                    if(pendingBackup!=null)return;
+                    pendingBackup=json;
+                    Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("application/json");
+                    intent.putExtra(Intent.EXTRA_TITLE,"kalori-kayitlarim.json");
+                    try {startActivityForResult(intent,BACKUP_SAVE_REQUEST);}
+                    catch(android.content.ActivityNotFoundException error){pendingBackup=null;}
+                });
+            }
+        },"KaloriAndroid");
         view.setWebChromeClient(new WebChromeClient() {
             @Override public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> callback, FileChooserParams params) {
                 if(uploadCallback!=null){uploadCallback.onReceiveValue(null);uploadCallback=null;}
@@ -51,6 +77,15 @@ public class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode==BACKUP_SAVE_REQUEST){
+            String json=pendingBackup;pendingBackup=null;
+            if(resultCode==RESULT_OK && data!=null && data.getData()!=null && json!=null){
+                try(OutputStream stream=getContentResolver().openOutputStream(data.getData(),"w")){
+                    if(stream!=null)stream.write(json.getBytes(StandardCharsets.UTF_8));
+                }catch(Exception error){android.util.Log.e("Kalori","Backup export failed",error);}
+            }
+            return;
+        }
         if(requestCode!=FILE_PICKER_REQUEST)return;
         if(uploadCallback!=null){
             Uri uri=resultCode==RESULT_OK&&data!=null?data.getData():null;
@@ -62,6 +97,7 @@ public class MainActivity extends Activity {
         if(view != null && view.canGoBack()) view.goBack(); else super.onBackPressed();
     }
     @Override public void onDestroy() {
+        pendingBackup=null;
         if(uploadCallback!=null){uploadCallback.onReceiveValue(null);uploadCallback=null;}
         if(view != null){view.destroy();view=null;}
         super.onDestroy();
