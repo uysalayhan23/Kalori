@@ -92,6 +92,20 @@ public final class ActivityBehaviorHarness {
    check(a.opened==3 && a.closed==3,"close failure must be attempted");
    check(get(a,"pendingBackup")==null,"close failure must release payload");
 
+   final int[] reopenedResponses={0};
+   set(a,"uploadCallback",(ValueCallback<Uri[]>)value->{reopenedResponses[0]++;check(value==null,"reopened chooser cancel must be null");});
+   a.handle(301,0,null);
+   check(reopenedResponses[0]==1,"reopened picker must complete after first cancellation");
+   check(get(a,"uploadCallback")==null,"reopened picker must clear callback");
+
+   final int[] destroyedResponses={0};
+   set(a,"uploadCallback",(ValueCallback<Uri[]>)value->{destroyedResponses[0]++;check(value==null,"destroy must cancel picker");});
+   set(a,"pendingBackup","{\"entries\":[],\"water\":{}}");
+   a.onDestroy();
+   check(destroyedResponses[0]==1,"destroy must cancel pending picker");
+   check(get(a,"uploadCallback")==null,"destroy must clear picker callback");
+   check(get(a,"pendingBackup")==null,"destroy must clear pending backup");
+
    CheckActivity recreated=new CheckActivity();
    recreated.handle(302,-1,document());
    check(recreated.opened==0,"recreated Activity must not write missing backup");
