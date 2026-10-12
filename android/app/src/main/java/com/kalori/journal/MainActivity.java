@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.webkit.JavascriptInterface;
 import java.io.OutputStream;
+import java.io.IOException;
+import android.widget.Toast;
 import java.nio.charset.StandardCharsets;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -50,7 +52,7 @@ public class MainActivity extends Activity {
                     intent.setType("application/json");
                     intent.putExtra(Intent.EXTRA_TITLE,"kalori-kayitlarim.json");
                     try {startActivityForResult(intent,BACKUP_SAVE_REQUEST);}
-                    catch(android.content.ActivityNotFoundException error){pendingBackup=null;}
+                    catch(android.content.ActivityNotFoundException error){pendingBackup=null;Toast.makeText(MainActivity.this,"Dosya kaydetme ekranı açılamadı.",Toast.LENGTH_LONG).show();}
                 });
             }
         },"KaloriAndroid");
@@ -102,8 +104,10 @@ public class MainActivity extends Activity {
             String json=pendingBackup;pendingBackup=null;
             if(resultCode==RESULT_OK && data!=null && data.getData()!=null && json!=null){
                 try(OutputStream stream=getContentResolver().openOutputStream(data.getData(),"w")){
-                    if(stream!=null)stream.write(json.getBytes(StandardCharsets.UTF_8));
-                }catch(Exception error){android.util.Log.e("Kalori","Backup export failed",error);}
+                    if(stream==null)throw new IOException("No output stream");
+                    stream.write(json.getBytes(StandardCharsets.UTF_8));
+                }catch(Exception error){android.util.Log.e("Kalori","Backup export failed",error);Toast.makeText(this,"Yedek kaydedilemedi. Farklı bir dosya konumu deneyin.",Toast.LENGTH_LONG).show();}
+                if(resultCode==RESULT_OK)Toast.makeText(this,"JSON yedeği kaydedildi.",Toast.LENGTH_SHORT).show();
             }
             return;
         }
