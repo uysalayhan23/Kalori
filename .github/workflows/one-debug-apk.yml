@@ -5,7 +5,7 @@ permissions:
   contents: read
 jobs:
   debug-apk:
-    if: ${{ github.event.ref_type == 'branch' && github.event.ref == 'build/kalori-retry-debug-20261012' }}
+    if: ${{ github.event.ref_type == 'branch' && github.event.ref == 'build/kalori-direct-apk-20261012' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -42,7 +42,7 @@ jobs:
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: kalori-debug-apk-retry
+          name: kalori-direct-install-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
