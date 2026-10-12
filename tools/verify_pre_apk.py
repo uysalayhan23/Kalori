@@ -50,6 +50,11 @@ if shutil.which("node"):
         if result.returncode:failures.append("Node check failed: "+file)
 else:
     print("NOT RUN: Node.js JS syntax/catalog tests (Node.js unavailable)")
+if shutil.which("javac"):
+    result=subprocess.run([sys.executable,"tools/check_android_java_stubs.py"],cwd=ROOT)
+    if result.returncode:failures.append("Android stub javac compilation failed")
+else:
+    print("NOT RUN: Android stub javac compilation (javac unavailable)")
 result=subprocess.run([sys.executable,"tools/audit_packaged.py","--input","packaged-foods.js"]+(["--min-products","1"] if args.release else []),cwd=ROOT)
 if result.returncode:failures.append("Packaged-food data audit failed")
 if failures:
