@@ -56,7 +56,7 @@ function open(name){
  const home=open('index.html');
  home.get('day').value=date;home.get('day').events.change();
  assert.equal(home.get('count').textContent,1);
- assert.ok(home.get('entries').children.some(row=>row.children.some(child=>child.textContent===food.name)));
+ assert.ok(home.get('entries').children.some(row=>row.children.some(child=>child.children.some(part=>part.textContent===food.name))));
  const history=open('history.html');
  history.get('day').value=date;history.get('day').events.change();
  assert.ok(history.get('entries').children.some(row=>row.children.some(child=>child.textContent.includes(food.name))));
