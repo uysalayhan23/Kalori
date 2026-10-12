@@ -60,9 +60,10 @@ async function scenario(failWrite=false,initial=null,restoreFile=null){
  assert.match(blocked.get('feedback').textContent,/saklanamadı/);
  const before=JSON.stringify({entries:[{id:'existing',day:'2026-10-12',food:'Eski kayıt'}],water:{}});
  const restored=await scenario(false,JSON.parse(before));
+ const restoreBaseline=restored.backing.get(journal.KEY);
  restored.get('restoreFile').files=[{size:12,text:async()=>'{not json'}];
  await restored.get('restore').click();
- assert.equal(restored.backing.get(journal.KEY),JSON.stringify(JSON.parse(before)));
+ assert.equal(restored.backing.get(journal.KEY),restoreBaseline);
  assert.match(restored.get('feedback').textContent,/değiştirilmedi/);
  restored.get('restoreFile').files=[{size:12,text:async()=>JSON.stringify({entries:[],water:{}})}];
  await restored.get('restore').click();
