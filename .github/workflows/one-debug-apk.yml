@@ -1,0 +1,42 @@
+name: Kalori first debug APK - one authorized build
+on:
+  create:
+permissions:
+  contents: read
+jobs:
+  debug-apk:
+    if: ${{ github.event.ref_type == 'branch' && github.event.ref == 'build/kalori-first-debug-20261012' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout authorized main revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android SDK command line tools
+        uses: android-actions/setup-android@v3
+      - name: Install Android 35 platform and build tools
+        run: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Set up Gradle 8.9 for AGP 8.7.3
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build single debug APK
+        run: gradle --no-daemon --stacktrace -p android :app:assembleDebug
+      - name: Verify APK and show SHA-256
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: kalori-first-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
