@@ -41,7 +41,7 @@ command=[sys.executable,"-m","unittest","discover","-s","tests","-p","test_*.py"
 proc=subprocess.run(command,cwd=ROOT)
 if proc.returncode:failures.append("Python unittest failed")
 if shutil.which("node"):
-    for file in ["food-catalog.js","packaged-foods.js","food-quality.js","journal-data.js","service-worker.js","tests/catalog.test.cjs","tests/food-quality.test.cjs","tests/service-worker.test.cjs","tests/journal-data.test.cjs","tests/page-integration.test.cjs","tests/interaction-contract.test.cjs","tests/android-backup.test.cjs","tests/android-webview-security.test.cjs"]:
+    for file in ["food-catalog.js","packaged-foods.js","food-quality.js","journal-data.js","service-worker.js","tests/catalog.test.cjs","tests/food-quality.test.cjs","tests/service-worker.test.cjs","tests/journal-data.test.cjs","tests/page-integration.test.cjs","tests/interaction-contract.test.cjs","tests/android-backup.test.cjs","tests/android-webview-security.test.cjs","tests/android-lifecycle.test.cjs"]:
         if file.endswith(".test.cjs"):
             cmd=["node",file]
         else:
