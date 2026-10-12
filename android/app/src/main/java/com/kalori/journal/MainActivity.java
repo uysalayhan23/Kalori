@@ -106,11 +106,13 @@ public class MainActivity extends Activity {
                 Toast.makeText(this,"Uygulama yeniden açıldığı için yedekleme tamamlanamadı. Lütfen yeniden deneyin.",Toast.LENGTH_LONG).show();
             }
             if(resultCode==RESULT_OK && data!=null && data.getData()!=null && json!=null){
+                boolean saved=false;
                 try(OutputStream stream=getContentResolver().openOutputStream(data.getData(),"w")){
                     if(stream==null)throw new IOException("No output stream");
                     stream.write(json.getBytes(StandardCharsets.UTF_8));
-                    Toast.makeText(this,"JSON yedeği kaydedildi.",Toast.LENGTH_SHORT).show();
+                    saved=true;
                 }catch(Exception error){android.util.Log.e("Kalori","Backup export failed",error);Toast.makeText(this,"Yedek kaydedilemedi. Farklı bir dosya konumu deneyin.",Toast.LENGTH_LONG).show();}
+                if(saved)Toast.makeText(this,"JSON yedeği kaydedildi.",Toast.LENGTH_SHORT).show();
             }
             return;
         }
