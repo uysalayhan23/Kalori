@@ -23,6 +23,7 @@ public class MainActivity extends Activity {
     private String pendingBackup;
     private ValueCallback<Uri[]> uploadCallback;
     private static final String ASSET_ORIGIN = "file:///android_asset/";
+    private static final String WEBVIEW_STATE = "kalori_webview_state";
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = new WebView(this);
@@ -76,7 +77,24 @@ public class MainActivity extends Activity {
             }
         });
         setContentView(view);
-        view.loadUrl(ASSET_ORIGIN+"index.html");
+        Bundle previous=savedInstanceState==null?null:savedInstanceState.getBundle(WEBVIEW_STATE);
+        if(previous==null || view.restoreState(previous)==null){view.loadUrl(ASSET_ORIGIN+"index.html");}
+    }
+    @Override protected void onSaveInstanceState(Bundle outState) {
+        if(view!=null){
+            Bundle webState=new Bundle();
+            view.saveState(webState);
+            outState.putBundle(WEBVIEW_STATE,webState);
+        }
+        super.onSaveInstanceState(outState);
+    }
+    @Override protected void onPause() {
+        if(view!=null)view.onPause();
+        super.onPause();
+    }
+    @Override protected void onResume() {
+        super.onResume();
+        if(view!=null)view.onResume();
     }
     @Override protected void onActivityResult(int requestCode,int resultCode,Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
@@ -102,7 +120,7 @@ public class MainActivity extends Activity {
     @Override public void onDestroy() {
         pendingBackup=null;
         if(uploadCallback!=null){uploadCallback.onReceiveValue(null);uploadCallback=null;}
-        if(view != null){view.destroy();view=null;}
+        if(view != null){view.stopLoading();view.removeJavascriptInterface("KaloriAndroid");view.destroy();view=null;}
         super.onDestroy();
     }
 }
