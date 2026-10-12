@@ -30,7 +30,7 @@ function show(storage){
 }
 const saved=new Map(),storage={getItem:k=>saved.get(k)??null,setItem:(k,v)=>saved.set(k,v)};
 const day=new Date();const date=[day.getFullYear(),String(day.getMonth()+1).padStart(2,'0'),String(day.getDate()).padStart(2,'0')].join('-');
-const entry={id:'between-pages',day,food:'Ev yapımı öğün',meal:'Öğle',time:'12:00',kcal:null};
+const entry={id:'between-pages',day:date,food:'Ev yapımı öğün',meal:'Öğle',time:'12:00',kcal:null};
 journal.write(storage,journal.add(journal.read(storage),entry));
 let page=show(storage);
 assert.ok(page.get('entries').children.some(row=>row.children.some(child=>child.textContent.includes('Ev yapımı öğün'))),'history should show saved home/meal-builder entry');
