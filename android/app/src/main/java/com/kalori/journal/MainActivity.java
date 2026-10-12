@@ -32,6 +32,8 @@ public class MainActivity extends Activity {
         view.getSettings().setAllowContentAccess(true);
         view.getSettings().setAllowFileAccessFromFileURLs(false);
         view.getSettings().setAllowUniversalAccessFromFileURLs(false);
+        view.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        view.getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
         view.addJavascriptInterface(new Object() {
             @JavascriptInterface public void saveBackup(String json) {
                 if(json==null || json.length()>5_000_000)return;
@@ -66,8 +68,9 @@ public class MainActivity extends Activity {
             @Override public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest request) {
                 Uri uri=request.getUrl();
                 if ("file".equals(uri.getScheme()) && uri.toString().startsWith(ASSET_ORIGIN)) return false;
-                if ("https".equals(uri.getScheme())) {
-                    startActivity(new Intent(Intent.ACTION_VIEW,uri));
+                if (request.isForMainFrame() && "https".equals(uri.getScheme())) {
+                    try {startActivity(new Intent(Intent.ACTION_VIEW,uri));}
+                    catch(android.content.ActivityNotFoundException error){android.util.Log.w("Kalori","No HTTPS handler");}
                 }
                 return true;
             }
