@@ -15,7 +15,7 @@ assert.ok(script);
 class Element {
  constructor(){this.children=[];this.value='';this.textContent='';this.hidden=true;this.style={};this.events={};}
  append(...x){this.children.push(...x)}
- replaceChildren(...x){this.children=x}
+ replaceChildren(...x){this.children=x;if(x.length && typeof x[0].value==="string")this.value=x[0].value}
  get childElementCount(){return this.children.length}
  addEventListener(name,fn){this.events[name]=fn}
 }
