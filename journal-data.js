@@ -29,7 +29,31 @@
   function add(data,entry){return {...data,entries:[...data.entries,entry]}}
   function remove(data,id){return {...data,entries:data.entries.filter(e=>e.id!==id)}}
   function water(data,day,delta){const count=data.water[day]||0;return {...data,water:{...data.water,[day]:Math.min(1000,Math.max(0,count+delta))}}}
-  const api={KEY,valid,read,write,add,remove,water};
+  // Optional cross-tab API. Never claim synchronization without a real lock manager.
+  // Legacy read/write remain unchanged until all screen mutations are migrated.
+  async function lockedUpdate(storage,locks,change){
+    if(!locks||typeof locks.request!=='function')throw Error('Journal cross-tab lock unavailable');
+    if(typeof change!=='function')throw TypeError('change must be a function');
+    return locks.request('kalori_journal_v1_write',{mode:'exclusive'},()=>{
+      const before=read(storage);
+      const next=change(before);
+      if(next&&typeof next.then==='function')throw TypeError('Async transform cannot run in localStorage transaction');
+      write(storage,next);
+      return next;
+    });
+  }
+  async function lockedRestore(storage,locks,backup,expectedRaw){
+    if(!valid(backup))throw Error('Invalid journal backup');
+    if(!locks||typeof locks.request!=='function')throw Error('Journal cross-tab lock unavailable');
+    return locks.request('kalori_journal_v1_write',{mode:'exclusive'},()=>{
+      const actual=storage.getItem(KEY);
+      if(actual!==expectedRaw)throw Error('Journal changed before restore');
+      if(actual!==null)read(storage); // Do not overwrite an unreadable journal.
+      write(storage,backup);
+      return backup;
+    });
+  }
+  const api={KEY,valid,read,write,add,remove,water,lockedUpdate,lockedRestore};
   root.KaloriJournal=api;
   if(typeof module==='object'&&module.exports)module.exports=api;
 })(globalThis);
