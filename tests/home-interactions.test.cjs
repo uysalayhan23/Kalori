@@ -25,7 +25,9 @@ async function scenario(failWrite=false,initial=null,restoreFile=null){
  const get=id=>{if(!els.has(id))els.set(id,new El());return els.get(id)};
  const store={getItem:k=>backing.get(k)??null,setItem(k,v){if(failWrite)throw Error('quota');backing.set(k,v)}};
  const document={getElementById:get,createElement:()=>new El()};
+ const windowEvents={};
  const context={KaloriJournal:journal,localStorage:store,document,console,Date,Math,Number,String,Map,Set,
+  addEventListener:(type,handler)=>{windowEvents[type]=handler},
   confirm:()=>true,crypto:{randomUUID:()=> 'browser-test-'+Math.random()},navigator:{},location:{protocol:'file:'},
   Blob:class{},URL:{createObjectURL:()=>'',revokeObjectURL(){}},setTimeout:()=>{}};
  context.globalThis=context;
@@ -33,7 +35,7 @@ async function scenario(failWrite=false,initial=null,restoreFile=null){
  get('day').value='2026-10-12';get('food').value='Sandviç';get('meal').value='Öğle';get('mealTime').value='12:00';
  get('portion').value='1 porsiyon';
  await get('foodForm').submit();
- return {get,backing,store,context};
+ return {get,backing,store,context,windowEvents};
 }
 (async()=>{
  const s=await scenario();
@@ -77,6 +79,18 @@ async function scenario(failWrite=false,initial=null,restoreFile=null){
  assert.equal(failedRestore.backing.get(journal.KEY),previous,'failed restore preserves disk');
  assert.equal(failedRestore.get('count').textContent,2,'failed restore preserves UI'); // one existing plus scenario meal
  assert.match(failedRestore.get('feedback').textContent,/değiştirilmedi/);
+ const tabs=await scenario(false);
+ const date='2026-10-12';
+ const second=journal.add(journal.read(tabs.store),{id:'tab-2',day:date,food:'Diğer sekme'});
+ journal.write(tabs.store,second);
+ tabs.windowEvents.storage({key:journal.KEY});
+ assert.equal(tabs.get('count').textContent,2,'storage event refreshes visible journal');
+ assert.match(tabs.get('feedback').textContent,/başka bir sekmede güncellendi/);
+ tabs.store.getItem=()=>{throw Error('read blocked')};
+ tabs.windowEvents.storage({key:journal.KEY});
+ assert.match(tabs.get('feedback').textContent,/okunamadı/);
+ tabs.get('waterAdd').click();
+ assert.match(tabs.get('feedback').textContent,/önce yedekleyin/);
  const racing=await scenario(false);
  let resolveFile;
  const deferred=new Promise(resolve=>{resolveFile=resolve});
