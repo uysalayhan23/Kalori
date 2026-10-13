@@ -6,7 +6,7 @@ from pathlib import Path
 import shutil
 ROOT=Path(__file__).resolve().parents[1]
 TARGET=ROOT/"android"/"app"/"src"/"main"/"assets"
-FILES=["index.html","foods.html","meal-builder.html","profile.html","barcode.html","history.html","food-catalog.js","packaged-foods.js","food-quality.js","journal-data.js","manifest.webmanifest","service-worker.js"]
+FILES=["index.html","foods.html","meal-builder.html","profile.html","barcode.html","history.html","food-catalog.js","packaged-foods.js","food-quality.js","journal-data.js","kalori-ui.css","kalori-nav.js","manifest.webmanifest","service-worker.js"]
 TARGET.mkdir(parents=True,exist_ok=True)
 for filename in FILES:
     origin=ROOT/filename
