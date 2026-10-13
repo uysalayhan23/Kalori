@@ -8,7 +8,7 @@ parser=argparse.ArgumentParser(description="Local pre-APK checks; never builds A
 parser.add_argument("--release",action="store_true",help="Block if real packaged catalog is empty")
 args=parser.parse_args()
 required=["index.html","foods.html","meal-builder.html","profile.html","barcode.html","history.html",
-          "food-catalog.js","packaged-foods.js","food-quality.js","journal-data.js","manifest.webmanifest","service-worker.js",
+          "food-catalog.js","packaged-foods.js","food-quality.js","journal-data.js","kalori-ui.css","kalori-nav.js","manifest.webmanifest","service-worker.js",
           "tools/import_openfoodfacts.py","tools/import_usda.py","tools/audit_packaged.py"]
 failures=[]
 android_files=[
