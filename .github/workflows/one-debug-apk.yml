@@ -5,7 +5,7 @@ permissions:
   contents: read
 jobs:
   debug-apk:
-    if: ${{ github.event.ref_type == 'branch' && github.event.ref == 'build/kalori-direct-apk-20261012' }}
+    if: ${{ github.event.ref_type == 'branch' && github.event.ref == 'build/kalori-health-ui-20261013' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -35,14 +35,14 @@ jobs:
         run: |
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
-          for asset in index.html journal-data.js meal-builder.html history.html food-catalog.js; do
+          for asset in index.html meal-builder.html foods.html history.html profile.html barcode.html kalori-ui.css kalori-nav.js journal-data.js food-catalog.js packaged-foods.js food-quality.js; do
             unzip -Z1 "$APK" | grep -Fx "assets/$asset"
           done
           sha256sum "$APK"
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: kalori-direct-install-apk
+          name: kalori-health-ui-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
