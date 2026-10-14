@@ -29,3 +29,11 @@ Türkçe, mobil uyumlu, ilk sürümü internet olmadan kullanılabilen beslenme 
 5. Erişilebilirlik ve otomatik testler
 
 Geliştirme: normal GitHub akışı; Actions çalıştırılmadan, commitlerde [skip ci].
+
+## Android ve iOS kurulumu
+
+- **Android:** Kaynaklardan çevrimdışı çalışan WebView APK derlenebilir; güncel APK ayrıca oluşturulmalıdır.
+- **iPhone/iPad:** Aynı arayüz, HTTPS üzerinden yayımlandığında Safari'den Ana Ekrana Ekle ile PWA olarak kullanılabilir; bu IPA/App Store uygulaması değildir.
+- **Veriler:** Android ve iPhone kayıtları otomatik eşitlenmez. Geçiş için JSON yedeği kullanılır.
+- Kurulum adımları: [Android ve iOS kurulum kılavuzu](docs/ANDROID_IOS_KURULUM.md).
+- **GitHub Pages yayımlaması Actions dağıtımı başlatır**; ayrı kullanıcı izni olmadan etkinleştirilmez.
