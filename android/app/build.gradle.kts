@@ -9,7 +9,7 @@ val syncKaloriWebAssets by tasks.registering(Sync::class) {
         include(
             "index.html", "foods.html", "meal-builder.html", "profile.html",
             "barcode.html", "history.html", "food-catalog.js",
-            "packaged-foods.js", "food-quality.js", "journal-data.js", "kalori-ui.css", "kalori-nav.js", "manifest.webmanifest", "service-worker.js"
+            "packaged-foods.js", "food-quality.js", "journal-data.js", "kalori-ui.css", "kalori-nav.js", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "manifest.webmanifest", "service-worker.js"
         )
     }
     into(generatedKaloriWebAssets)
