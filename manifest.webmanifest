@@ -5,7 +5,34 @@
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f5f8f4",
-  "theme_color": "#174e39",
-  "description": "Çevrimdışı kullanılabilen beslenme günlüğü ve öğün planlama uygulaması"
+  "background_color": "#f5f6f9",
+  "theme_color": "#3569e8",
+  "description": "Çevrimdışı kullanılabilen beslenme günlüğü ve öğün planlama uygulaması",
+  "id": "./",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Öğün ekle",
+      "short_name": "Öğün",
+      "url": "./meal-builder.html"
+    },
+    {
+      "name": "Beslenme geçmişi",
+      "short_name": "Geçmiş",
+      "url": "./history.html"
+    }
+  ]
 }
