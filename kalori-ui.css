@@ -56,3 +56,6 @@ footer{background:transparent!important;color:#8992a3!important;padding:6px 18px
 @media(max-width:700px){.grid{grid-template-columns:1fr!important}.full{grid-column:auto!important}.stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.meals{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:380px){.kh-shortcut{min-height:84px;font-size:.69rem;padding:10px 2px}.kh-shortcut-icon{width:35px;height:35px}.stat{padding:12px!important}.value{font-size:1.23rem!important}.meals{grid-template-columns:1fr!important}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Respect iPhone standalone safe areas while keeping Android WebView intact. */
+body>header{padding-top:calc(28px + env(safe-area-inset-top,0px))!important}
