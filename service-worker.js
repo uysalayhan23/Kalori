@@ -1,6 +1,6 @@
 /* Offline app shell only: never cache API responses or private diary data. */
-const VERSION="kalori-static-v6";
-const SHELL=["./","./index.html","./foods.html","./meal-builder.html","./profile.html","./barcode.html","./history.html","./food-catalog.js","./packaged-foods.js","./food-quality.js","./journal-data.js","./kalori-ui.css","./kalori-nav.js","./manifest.webmanifest"];
+const VERSION="kalori-static-v7";
+const SHELL=["./","./index.html","./foods.html","./meal-builder.html","./profile.html","./barcode.html","./history.html","./food-catalog.js","./packaged-foods.js","./food-quality.js","./journal-data.js","./kalori-ui.css","./kalori-nav.js","./apple-touch-icon.png","./icon-192.png","./icon-512.png","./manifest.webmanifest"];
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(VERSION).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
 });
